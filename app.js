@@ -965,6 +965,13 @@ const App = {
       records: {} // { 'YYYY-MM-DD': { checkIn: '09:02', checkOut: '18:10', note: '' } }
     });
     this.dailyCases = Store.get('dailyCases', []); // [{id, date, caseName, project, caseRecorded, consentForm, deductions:{a,b,c}, note}]
+    // 术后护理 & 禁忌症（可编辑）
+    this.dermaPostopCare = Store.get('dermaPostopCare', DERMA_TREATMENTS['术后护理指南'] || []);
+    this.dermaContraindications = Store.get('dermaContraindications', [
+      { name: '射频类禁忌症', type: '禁忌症', detail: '1，带有任何金属植入物\n2，全身系统性疾病：肿瘤，糖尿病，冠心病，免疫性疾病，凝血功能障碍或口服抗凝药，癫痫，精神类疾病；\n3，治疗部位有活动性皮肤病\n4，瘢痕疙瘩史，皮肤萎缩症\n5，妊娠期，哺乳期，生理周期\n6，对射频介质过敏' },
+      { name: '胶原中胚层治疗的绝对禁忌症', type: '禁忌症', detail: '对产品成分过敏\n胶原蛋白过敏；其他成分过敏：对麻药（利多卡因/丙胺卡因）、产品中的赋形剂、交联剂等过敏。高敏体质：有严重过敏性休克史、多重药物过敏史，谨慎评估。\n自身免疫性疾病：如系统性红斑狼疮、硬皮病、皮肌炎、混合性结缔组织病等。任何免疫激活都可能诱发病情活动，属同一禁忌。\n治疗区域存在感染\n有明确增生性瘢痕或瘢痕疙瘩病史者。密集微针或注射可能形成难以控制的肉芽肿或增生性瘢痕。\n凝血功能障碍或抗凝治疗：血友病、血小板减少性紫癜、肝脏疾病导致的凝血异常。正在服用阿司匹林、华法林、氯吡格雷等抗凝/抗血小板药物（需遵医嘱停药至少1周，不可自行停用）。\n妊娠及哺乳期：麻药、产品成分的全身影响尚不明确，疼痛刺激、术后炎症反应均属风险。\n治疗区域有活动性皮肤病：如银屑病进行期、湿疹急性渗出期、白癜风进展期（可能诱发同形反应）、扁平苔藓等。皮肤屏障已破坏，有创操作会使病情加重扩散。\n恶性肿瘤患者' },
+      { name: '光子的绝对禁忌症', type: '禁忌症', detail: '光敏性疾病及自身免疫病。如系统性红斑狼疮（活动期）、卟啉病、皮肌炎等。尤其注意：BBL治疗的是宽谱连续光，能量累计蓄热强，对光敏感人群诱发风险极高；黑金DPL虽窄谱，但总剂量仍不可忽视。\n光敏性药物或食物摄入期：口服维A酸（如泰尔丝）：一般要求停药6个月以上（部分新观点认为低剂量3个月可，但医生多持保守态度）。三者都会使表皮变薄、干燥，热损伤风险大增。近期服用过四环素类、磺胺类、吩噻嗪类等光敏药物。食用光敏食物（如芹菜、香菜、无花果等）后即刻不建议做，虽影响相对小，但需告知医生。\n妊娠及哺乳期：虽无明确证据表明光对胎儿有伤害，但疼痛刺激、皮肤屏障暂时性改变及可能需用的镇定凝胶等，都使这段时间不宜进行。\n治疗区域有恶性皮肤肿瘤或癌前病变：如基底细胞癌、鳞状细胞癌部位，或发育不良的痣未经皮肤科评估前。\n治疗区域有活动性感染：如单纯疱疹正发作期、脓疱疮、疖肿等痘痘开放性伤口。\n近期暴晒、晒伤或者人工美黑\n对治疗效果抱有不切实际的幻想' }
+    ]);
   },
 
   saveTodos() { Store.set('todos', this.todos); },
@@ -984,6 +991,8 @@ const App = {
   saveAiRules() { Store.set('aiRules', this.aiRules); },
   saveAttendance() { Store.set('attendance', this.attendance); },
   saveDailyCases() { Store.set('dailyCases', this.dailyCases); },
+  saveDermaPostopCare() { Store.set('dermaPostopCare', this.dermaPostopCare); },
+  saveDermaContraindications() { Store.set('dermaContraindications', this.dermaContraindications); },
 
   // ---- 导航 ----
   navigate(pageId) {
@@ -1085,9 +1094,9 @@ const App = {
             <div style="font-size: 28px; margin-bottom: 4px;">📔</div>
             <div style="font-size: 11px; color: var(--text-light);">日记</div>
           </div>
-          <div onclick="App.goToLife('expense')" style="cursor:pointer; padding: 12px 4px; border-radius: 12px; background: var(--primary-light); transition: transform 0.15s;">
-            <div style="font-size: 28px; margin-bottom: 4px;">💰</div>
-            <div style="font-size: 11px; color: var(--text-light);">记账</div>
+          <div onclick="App.goToLife('note')" style="cursor:pointer; padding: 12px 4px; border-radius: 12px; background: var(--primary-light); transition: transform 0.15s;">
+            <div style="font-size: 28px; margin-bottom: 4px;">📝</div>
+            <div style="font-size: 11px; color: var(--text-light);">笔记</div>
           </div>
           <div onclick="App.goToLife('case')" style="cursor:pointer; padding: 12px 4px; border-radius: 12px; background: var(--secondary-light); transition: transform 0.15s;">
             <div style="font-size: 28px; margin-bottom: 4px;">📋</div>
@@ -1127,8 +1136,8 @@ const App = {
             <div style="font-size:10px; color:var(--text-light);">习惯</div>
           </div>
           <div style="flex:1;">
-            <div style="font-size:20px; font-weight:700; color:var(--danger);">¥${this.getTodayExpense()}</div>
-            <div style="font-size:10px; color:var(--text-light);">支出</div>
+            <div style="font-size:20px; font-weight:700; color:var(--danger);">${this.notes.length}</div>
+            <div style="font-size:10px; color:var(--text-light);">笔记</div>
           </div>
           <div style="flex:1;">
             <div style="font-size:20px; font-weight:700; color:var(--secondary);">${this.health.water}/${this.health.waterGoal}</div>
@@ -1248,7 +1257,6 @@ const App = {
 
       <div style="display:flex; gap:8px; margin-bottom:16px; overflow-x:auto;">
         <div class="chip ${activeTab==='tasks'?'active':''}" onclick="App.switchTodoTab('tasks')">📝 待办</div>
-        <div class="chip ${activeTab==='habits'?'active':''}" onclick="App.switchTodoTab('habits')">🌱 习惯</div>
         <div class="chip ${activeTab==='schedule'?'active':''}" onclick="App.switchTodoTab('schedule')">📅 日程</div>
         <div class="chip ${activeTab==='attendance'?'active':''}" onclick="App.switchTodoTab('attendance')">⏰ 打卡</div>
         <div class="chip ${activeTab==='calendar'?'active':''}" onclick="App.switchTodoTab('calendar')">🗓️ 月历</div>
@@ -1257,7 +1265,6 @@ const App = {
     `;
     this.renderFab('➕', () => {
       if (activeTab === 'tasks') this.showAddTodoModal();
-      else if (activeTab === 'habits') this.showAddHabitModal();
       else this.showAddScheduleModal();
     });
   },
@@ -1287,9 +1294,6 @@ const App = {
             `).join('')}
           </div>` : ''}
       `;
-    } else if (tab === 'habits') {
-      return this.habits.map(h => this.renderHabitCard(h)).join('') +
-        (this.habits.length === 0 ? this.emptyHTML('🌱', '添加一个习惯开始打卡') : '');
     } else if (tab === 'schedule') {
       const repeatLabel = { daily: '每天', weekly: '每周', once: '单次' };
       return (this.schedules.length === 0 ? this.emptyHTML('📅', '添加日程安排') : '') +
@@ -1332,7 +1336,6 @@ const App = {
     } else {
       this.renderFab('➕', () => {
         if (tab === 'tasks') this.showAddTodoModal();
-        else if (tab === 'habits') this.showAddHabitModal();
         else this.showAddScheduleModal();
       });
     }
@@ -1340,7 +1343,6 @@ const App = {
     document.querySelectorAll('.chip').forEach(c => {
       const t = c.textContent;
       if (t.includes('待办')) c.classList.toggle('active', tab === 'tasks');
-      else if (t.includes('习惯')) c.classList.toggle('active', tab === 'habits');
       else if (t.includes('日程')) c.classList.toggle('active', tab === 'schedule');
       else if (t.includes('月历')) c.classList.toggle('active', tab === 'calendar');
       else if (t.includes('打卡')) c.classList.toggle('active', tab === 'attendance');
@@ -1455,12 +1457,13 @@ const App = {
   },
 
   showAddHabitModal() {
+    const icons = ['💧','📚','🏃','🧘','🎯','✍️','🌱','☕','🛏️','🦷','💊','🎨'];
     this.showModal('添加习惯', `
       <div class="field-label">习惯名称</div>
       <input class="input" id="habitName" placeholder="如：早起、跑步..." maxlength="12">
       <div class="field-label">选择图标</div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${['💧','📚','🏃','🧘','🎯','✍️','🌱','☕','🛏️','🦷','💊','🎨'].map((e,i) => `
+        ${icons.map((e,i) => `
           <div class="mood-option habit-emoji ${i===0?'selected':''}" onclick="App.selectHabitEmoji(this,'${e}')">${e}</div>
         `).join('')}
       </div>
@@ -1537,7 +1540,7 @@ const App = {
   },
 
   // ============================================
-  // 生活模块 — 日记/记账/笔记
+  // 生活模块 — 日记/笔记
   // ============================================
   renderLife(wrap) {
     const sub = this.lifeSubPage || 'diary';
@@ -1560,36 +1563,6 @@ const App = {
           </div>
         `).join('')}
       `;
-    } else if (sub === 'expense') {
-      const monthExp = this.expenses.filter(e => e.type === 'expense').reduce((s,e)=>s+e.amount,0);
-      const monthInc = this.expenses.filter(e => e.type === 'income').reduce((s,e)=>s+e.amount,0);
-      contentHtml = `
-        <div class="card" style="text-align:center; padding: 24px 16px;">
-          <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">本月结余</div>
-          <div style="font-size: 36px; font-weight: 700; color: var(--primary-dark);">¥${(monthInc - monthExp).toFixed(1)}</div>
-          <div style="display:flex; justify-content: center; gap: 24px; margin-top: 12px;">
-            <div><span style="color:var(--success); font-weight:600;">+¥${monthInc.toFixed(1)}</span> <span style="font-size:11px; color:var(--text-light);">收入</span></div>
-            <div><span style="color:var(--danger); font-weight:600;">-¥${monthExp.toFixed(1)}</span> <span style="font-size:11px; color:var(--text-light);">支出</span></div>
-          </div>
-        </div>
-        ${this.expenses.length === 0 ? this.emptyHTML('💰', '记一笔收支') : `
-          <div class="section-title">收支明细</div>
-          <div class="card">
-            ${this.expenses.sort((a,b)=>b.id-a.id).map(e => `
-              <div class="expense-row">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <span style="font-size:24px;">${e.icon}</span>
-                  <div>
-                    <div style="font-weight:600; font-size:14px;">${e.category}</div>
-                    <div style="font-size:11px; color:var(--text-light);">${e.dateStr}</div>
-                  </div>
-                </div>
-                <span class="expense-amount ${e.type}">${e.type==='income'?'+':'-'}¥${e.amount}</span>
-              </div>
-            `).join('')}
-          </div>
-        `}
-      `;
     } else if (sub === 'note') {
       contentHtml = `
         ${this.notes.length === 0 ? this.emptyHTML('📝', '创建第一条笔记') : ''}
@@ -1598,6 +1571,7 @@ const App = {
             <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${n.title}</div>
             <div style="font-size:13px; line-height:1.6; color:var(--text-light); white-space:pre-wrap;">${n.content}</div>
             <div style="margin-top:8px; text-align:right;">
+              <button class="delete-btn" onclick="App.editNote(${n.id})">✏️</button>
               <button class="delete-btn" onclick="App.deleteNote(${n.id})">🗑️</button>
             </div>
           </div>
@@ -1608,7 +1582,7 @@ const App = {
       const activeBooks = (this.readings||[]).filter(r => r.status==='reading');
       const doneBooks = (this.readings||[]).filter(r => r.status==='done');
       const totalMin = (this.readings||[]).reduce((s,r)=>s+(r.totalMinutes||0),0);
-      contentHtml = '<div class="card" style="text-align:center;padding:20px 16px;"><div style="font-size:12px;color:var(--text-light);margin-bottom:4px;">阅读统计</div><div style="display:flex;justify-content:center;gap:20px;margin-top:8px;"><div><span style="font-size:24px;font-weight:700;color:var(--primary-dark);">'+activeBooks.length+'</span> <span style="font-size:11px;color:var(--text-light);">在读</span></div><div><span style="font-size:24px;font-weight:700;color:var(--success);">'+doneBooks.length+'</span> <span style="font-size:11px;color:var(--text-light);">已读完</span></div><div><span style="font-size:24px;font-weight:700;color:var(--secondary-dark);">'+totalMin+'\'</span> <span style="font-size:11px;color:var(--text-light);">总时长</span></div></div></div><div class="section-title">📲 快捷打开</div><div class="card" style="display:flex;justify-content:space-around;padding:16px 8px;">'+appLinks.map(a=>'<div onclick="App.openReadingApp(\''+a.url+'\')" style="text-align:center;cursor:pointer;padding:8px 12px;border-radius:12px;background:var(--secondary-light);"><div style="font-size:28px;">'+a.icon+'</div><div style="font-size:11px;color:var(--text);margin-top:4px;font-weight:600;">'+a.name+'</div></div>').join('')+'</div>'+(this.readings.length===0?this.emptyHTML('📚','添加一本在读的书'):'<div class="section-title">📖 我的书架</div>'+(this.readings||[]).sort((a,b)=>b.id-a.id).map(r=>{const p=r.totalPages>0?Math.round(r.currentPage/r.totalPages*100):0;const sb=r.status==='done'?'✅ 已读完':'📖 在读';return '<div class="card"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;"><div style="flex:1;"><div style="font-weight:700;font-size:15px;">'+(r.emoji||'📘')+' '+r.title+'</div><div style="font-size:12px;color:var(--text-light);margin-top:2px;">'+(r.author||'未知作者')+' · '+(r.type==='audio'?'🎧 听书':'📖 阅读')+'</div></div><span style="font-size:11px;padding:3px 8px;border-radius:8px;background:var(--primary-light);color:var(--primary-dark);font-weight:600;flex-shrink:0;">'+sb+'</span></div>'+(r.status==='reading'?'<div style="margin:8px 0;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-light);">进度 '+r.currentPage+'/'+r.totalPages+'页</span><span style="font-weight:600;color:var(--primary-dark);">'+p+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+p+'%;"></div></div></div><div style="display:flex;gap:8px;margin-top:8px;"><button class="chip" style="font-size:12px;padding:6px 12px;" onclick="App.updateReadingProgress('+r.id+')">📊 更新进度</button><button class="chip" style="font-size:12px;padding:6px 12px;" onclick="App.finishReading('+r.id+')">✅ 标记读完</button><button class="delete-btn" onclick="App.deleteReading('+r.id+')">🗑️</button></div>':'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;"><span style="font-size:12px;color:var(--text-light);">'+(r.finishedDate||'')+' '+(r.totalMinutes>0?'· 用时'+r.totalMinutes+'分钟':'')+'</span><button class="delete-btn" onclick="App.deleteReading('+r.id+')">🗑️</button></div>')+(r.note?'<div onclick="App.showAddReadingModalById('+r.id+')" style="margin-top:6px;font-size:12px;color:var(--text-light);background:var(--bg-card);padding:8px;border-radius:8px;line-height:1.5;cursor:pointer;">💭 '+r.note+' <span style="color:var(--primary-dark);font-size:11px;">✏️</span></div>':'<div onclick="App.showAddReadingModalById('+r.id+')" style="margin-top:6px;font-size:12px;color:var(--text-muted);cursor:pointer;">+ 添加笔记</div>')+'</div>';}).join(''))+'</div>';
+      contentHtml = '<div class="card" style="text-align:center;padding:20px 16px;"><div style="font-size:12px;color:var(--text-light);margin-bottom:4px;">阅读统计</div><div style="display:flex;justify-content:center;gap:20px;margin-top:8px;"><div><span style="font-size:24px;font-weight:700;color:var(--primary-dark);">'+activeBooks.length+'</span> <span style="font-size:11px;color:var(--text-light);">在读</span></div><div><span style="font-size:24px;font-weight:700;color:var(--success);">'+doneBooks.length+'</span> <span style="font-size:11px;color:var(--text-light);">已读完</span></div><div><span style="font-size:24px;font-weight:700;color:var(--secondary-dark);">'+totalMin+'\'</span> <span style="font-size:11px;color:var(--text-light);">总时长</span></div></div></div><div class="section-title">📲 快捷打开</div><div class="card" style="display:flex;justify-content:space-around;padding:16px 8px;">'+appLinks.map(a=>'<div onclick="App.openReadingApp(\''+a.url+'\')" style="text-align:center;cursor:pointer;padding:8px 12px;border-radius:12px;background:var(--secondary-light);"><div style="font-size:28px;">'+a.icon+'</div><div style="font-size:11px;color:var(--text);margin-top:4px;font-weight:600;">'+a.name+'</div></div>').join('')+'</div>'+(this.readings.length===0?this.emptyHTML('📚','添加一本在读的书'):'<div class="section-title">📖 我的书架</div>'+(this.readings||[]).sort((a,b)=>b.id-a.id).map(r=>{const p=r.totalPages>0?Math.round(r.currentPage/r.totalPages*100):0;const sb=r.status==='done'?'✅ 已读完':'📖 在读';return '<div class="card"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;"><div style="flex:1;"><div style="font-weight:700;font-size:15px;">'+(r.emoji||'📘')+' '+r.title+'</div><div style="font-size:12px;color:var(--text-light);margin-top:2px;">'+(r.author||'未知作者')+' · '+(r.type==='audio'?'🎧 听书':'📖 阅读')+'</div></div><span style="font-size:11px;padding:3px 8px;border-radius:8px;background:var(--primary-light);color:var(--primary-dark);font-weight:600;flex-shrink:0;">'+sb+'</span></div>'+(r.status==='reading'?'<div style="margin:8px 0;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-light);">进度 '+r.currentPage+'/'+r.totalPages+'页</span><span style="font-weight:600;color:var(--primary-dark);">'+p+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+p+'%;"></div></div></div><div style="display:flex;gap:8px;margin-top:8px;"><button class="chip" style="font-size:12px;padding:6px 12px;" onclick="App.updateReadingProgress('+r.id+')">📊 更新进度</button><button class="chip" style="font-size:12px;padding:6px 12px;" onclick="App.finishReading('+r.id+')">✅ 标记读完</button><button class="delete-btn" onclick="App.deleteReading('+r.id+')">🗑️</button></div>':'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;"><span style="font-size:12px;color:var(--text-light);">'+(r.finishedDate||'')+' '+(r.totalMinutes>0?'· 用时'+r.totalMinutes+'分钟':'')+'</span><button class="delete-btn" onclick="App.deleteReading('+r.id+')">🗑️</button></div>')+(r.note?'<div style="margin-top:6px;font-size:12px;color:var(--text-light);background:var(--bg-card);padding:8px;border-radius:8px;line-height:1.5;">💭 '+r.note+'</div>':'')+'</div>';}).join(''))+'</div>';
     } else if (sub === 'case') {
       contentHtml = this.renderCaseList();
     }
@@ -1624,7 +1598,6 @@ const App = {
 
       <div style="display:flex; gap:8px; margin-bottom:16px; overflow-x:auto;">
         <div class="chip ${sub==='diary'?'active':''}" onclick="App.goToLife('diary')">📔 日记</div>
-        <div class="chip ${sub==='expense'?'active':''}" onclick="App.goToLife('expense')">💰 记账</div>
         <div class="chip ${sub==='note'?'active':''}" onclick="App.goToLife('note')">📝 笔记</div>
         <div class="chip ${sub==='reading'?'active':''}" onclick="App.goToLife('reading')">📚 阅读</div>
         <div class="chip ${sub==='case'?'active':''}" onclick="App.goToLife('case')">📋 案例</div>
@@ -1634,7 +1607,6 @@ const App = {
 
     this.renderFab('➕', () => {
       if (sub === 'diary') this.showAddDiaryModal();
-      else if (sub === 'expense') this.showAddExpenseModal();
       else if (sub === 'reading') this.showAddReadingModal();
       else if (sub === 'case') this.showAddCaseModal();
       else this.showAddNoteModal();
@@ -1663,37 +1635,6 @@ const App = {
           </div>
         `).join('')}
       `;
-    } else if (sub === 'expense') {
-      const monthExp = this.expenses.filter(e => e.type === 'expense').reduce((s,e)=>s+e.amount,0);
-      const monthInc = this.expenses.filter(e => e.type === 'income').reduce((s,e)=>s+e.amount,0);
-      el.innerHTML = `
-        <div class="card" style="text-align:center; padding: 24px 16px;">
-          <div style="font-size: 12px; color: var(--text-light); margin-bottom: 4px;">本月结余</div>
-          <div style="font-size: 36px; font-weight: 700; color: var(--primary-dark);">¥${(monthInc - monthExp).toFixed(1)}</div>
-          <div style="display:flex; justify-content: center; gap: 24px; margin-top: 12px;">
-            <div><span style="color:var(--success); font-weight:600;">+¥${monthInc.toFixed(1)}</span> <span style="font-size:11px; color:var(--text-light);">收入</span></div>
-            <div><span style="color:var(--danger); font-weight:600;">-¥${monthExp.toFixed(1)}</span> <span style="font-size:11px; color:var(--text-light);">支出</span></div>
-          </div>
-        </div>
-
-        ${this.expenses.length === 0 ? this.emptyHTML('💰', '记一笔收支') : `
-          <div class="section-title">收支明细</div>
-          <div class="card">
-            ${this.expenses.sort((a,b)=>b.id-a.id).map(e => `
-              <div class="expense-row">
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <span style="font-size:24px;">${e.icon}</span>
-                  <div>
-                    <div style="font-weight:600; font-size:14px;">${e.category}</div>
-                    <div style="font-size:11px; color:var(--text-light);">${e.dateStr}</div>
-                  </div>
-                </div>
-                <span class="expense-amount ${e.type}">${e.type==='income'?'+':'-'}¥${e.amount}</span>
-              </div>
-            `).join('')}
-          </div>
-        `}
-      `;
     } else if (sub === 'note') {
       el.innerHTML = `
         ${this.notes.length === 0 ? this.emptyHTML('📝', '创建第一条笔记') : ''}
@@ -1702,6 +1643,7 @@ const App = {
             <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${n.title}</div>
             <div style="font-size:13px; line-height:1.6; color:var(--text-light); white-space:pre-wrap;">${n.content}</div>
             <div style="margin-top:8px; text-align:right;">
+              <button class="delete-btn" onclick="App.editNote(${n.id})">✏️</button>
               <button class="delete-btn" onclick="App.deleteNote(${n.id})">🗑️</button>
             </div>
           </div>
@@ -1722,6 +1664,11 @@ const App = {
     this.notes = this.notes.filter(n => n.id !== id);
     this.saveNotes();
     this.renderLifeContent();
+  },
+
+  editNote(id) {
+    const n = this.notes.find(x => x.id === id);
+    if (n) this.showAddNoteModal(n);
   },
 
   openReadingApp(url) { try { window.location.href = url; setTimeout(() => { this.toast('如果App没有打开，可能未安装该应用'); }, 3000); } catch(e) { this.toast('无法打开应用'); } },
@@ -1772,61 +1719,28 @@ const App = {
     el.classList.add('selected');
   },
 
-  showAddExpenseModal() {
-    const cats = [
-      { name: '餐饮', icon: '🍔', type: 'expense' },
-      { name: '交通', icon: '🚇', type: 'expense' },
-      { name: '购物', icon: '🛍️', type: 'expense' },
-      { name: '娱乐', icon: '🎬', type: 'expense' },
-      { name: '医疗', icon: '💊', type: 'expense' },
-      { name: '住房', icon: '🏠', type: 'expense' },
-      { name: '其他', icon: '📦', type: 'expense' },
-      { name: '工资', icon: '💰', type: 'income' },
-      { name: '副业', icon: '💻', type: 'income' },
-    ];
-    const today = new Date();
-    const dateStr = `${today.getMonth()+1}月${today.getDate()}日`;
-    this.showModal('记一笔', `
-      <div class="field-label">选择分类</div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${cats.map((c,i) => `
-          <div class="chip exp-cat ${i===0?'active':''}" onclick="App.selectCategory(this)" data-icon="${c.icon}" data-type="${c.type}">${c.icon} ${c.name}</div>
-        `).join('')}
-      </div>
-      <div class="field-label">金额</div>
-      <input class="input" id="expAmount" type="number" placeholder="0.0" inputmode="decimal">
-      <div class="field-label">备注（可选）</div>
-      <input class="input" id="expNote" placeholder="写点什么..." maxlength="30">
-    `, () => {
-      const cat = document.querySelector('.exp-cat.active');
-      if (!cat) return;
-      const amount = parseFloat(document.getElementById('expAmount').value);
-      if (!amount || amount <= 0) return;
-      const category = cat.textContent.trim().split(' ').slice(1).join(' ');
-      const icon = cat.dataset.icon;
-      const type = cat.dataset.type;
-      this.expenses.push({ id: Date.now(), category, icon, type, amount, dateStr, note: document.getElementById('expNote').value.trim() });
-      this.saveExpenses();
-      this.renderLifeContent();
-    });
-  },
-
-  selectCategory(el) {
-    document.querySelectorAll('.exp-cat').forEach(e => e.classList.remove('active'));
-    el.classList.add('active');
-  },
-
-  showAddNoteModal() {
-    this.showModal('写笔记', `
+  showAddNoteModal(existing) {
+    const isEdit = !!existing;
+    const n = existing || {};
+    this.showModal(isEdit ? '编辑笔记' : '写笔记', `
       <div class="field-label">标题</div>
-      <input class="input" id="noteTitle" placeholder="笔记标题" maxlength="30">
+      <input class="input" id="noteTitle" placeholder="笔记标题" maxlength="30" value="${n.title || ''}">
       <div class="field-label">内容</div>
-      <textarea class="input" id="noteContent" placeholder="写下你的想法..." rows="6" maxlength="500"></textarea>
+      <textarea class="input" id="noteContent" placeholder="写下你的想法..." rows="6">${n.content || ''}</textarea>
     `, () => {
       const title = document.getElementById('noteTitle').value.trim();
       const content = document.getElementById('noteContent').value.trim();
       if (!title) return;
-      this.notes.push({ id: Date.now(), title, content });
+      if (isEdit) {
+        const idx = this.notes.findIndex(x => x.id === n.id);
+        if (idx >= 0) {
+          this.notes[idx].title = title;
+          this.notes[idx].content = content;
+          this.notes[idx].updatedAt = Date.now();
+        }
+      } else {
+        this.notes.push({ id: Date.now(), title, content, createdAt: Date.now() });
+      }
       this.saveNotes();
       this.renderLifeContent();
     });
@@ -1843,7 +1757,7 @@ const App = {
 
     const totalDeduction = cases.reduce((s, c) => {
       const d = c.deductions || {};
-      return s + (parseFloat(d.a) || 0) + (parseFloat(d.b) || 0) + (parseFloat(d.c) || 0);
+      return s + (d.a ? 1 : 0) + (d.b ? 1 : 0) + (d.c ? 1 : 0);
     }, 0);
     const recordedCount = cases.filter(c => c.caseRecorded).length;
 
@@ -1858,8 +1772,8 @@ const App = {
           <div class="stat-label">已录入病例</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" style="color:var(--primary-dark);">¥${totalDeduction.toFixed(0)}</div>
-          <div class="stat-label">划扣合计</div>
+          <div class="stat-value" style="color:var(--primary-dark);">${totalDeduction}</div>
+          <div class="stat-label">划扣项数</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${cases.filter(c => c.consentForm).length}</div>
@@ -1871,8 +1785,7 @@ const App = {
   },
 
   _renderCaseItem(c) {
-    const d = c.deductions || {};
-    const totalDeduction = (parseFloat(d.a) || 0) + (parseFloat(d.b) || 0) + (parseFloat(d.c) || 0);
+    const d = c.deductions || {a: false, b: false, c: false};
     return `
       <div class="case-item" onclick="App.editCase(${c.id})" style="cursor:pointer;">
         <div class="case-item-header">
@@ -1886,10 +1799,9 @@ const App = {
           <span class="case-tag ${c.consentForm ? 'yes' : 'no'}">${c.consentForm ? '✓ 知情同意书' : '✗ 知情同意书'}</span>
         </div>
         <div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap; font-size:12px;">
-          <span class="case-tag neutral">划扣①：¥${d.a || 0}</span>
-          <span class="case-tag neutral">划扣②：¥${d.b || 0}</span>
-          <span class="case-tag neutral">划扣③：¥${d.c || 0}</span>
-          <span class="case-tag neutral" style="background:var(--secondary-light); color:var(--secondary);">合计：¥${totalDeduction.toFixed(0)}</span>
+          <span class="case-tag ${d.a ? 'yes' : 'no'}">划扣①：${d.a ? '✓ 已划扣' : '✗ 未划扣'}</span>
+          <span class="case-tag ${d.b ? 'yes' : 'no'}">划扣②：${d.b ? '✓ 已划扣' : '✗ 未划扣'}</span>
+          <span class="case-tag ${d.c ? 'yes' : 'no'}">划扣③：${d.c ? '✓ 已划扣' : '✗ 未划扣'}</span>
         </div>
         ${c.note ? `<div class="case-row" style="margin-top:6px;"><strong>备注：</strong>${this._escapeHtml(c.note)}</div>` : ''}
       </div>
@@ -1902,8 +1814,8 @@ const App = {
 
   showAddCaseModal(existing) {
     const isEdit = !!existing;
-    const c = existing || { date: this._dateToISO(new Date()), caseName: '', project: '', caseRecorded: false, consentForm: false, deductions: {a:0,b:0,c:0}, note: '' };
-    const d = c.deductions || {a:0,b:0,c:0};
+    const c = existing || { date: this._dateToISO(new Date()), caseName: '', project: '', caseRecorded: false, consentForm: false, deductions: {a:false,b:false,c:false}, note: '' };
+    const d = c.deductions || {a:false,b:false,c:false};
 
     this.showModal(isEdit ? '编辑案例' : '添加每日案例', `
       <div class="field-label">日期</div>
@@ -1925,11 +1837,11 @@ const App = {
         <div class="chip ${!c.consentForm?'active':''}" data-consentform="0" onclick="App._toggleCaseFlag(this,'consentForm')">❌ 未书写</div>
       </div>
 
-      <div class="field-label">划扣三项（金额）</div>
-      <div style="display:flex; gap:8px;">
-        <input class="input" id="caseDeductA" type="number" inputmode="decimal" placeholder="划扣①" value="${d.a||0}" style="flex:1;">
-        <input class="input" id="caseDeductB" type="number" inputmode="decimal" placeholder="划扣②" value="${d.b||0}" style="flex:1;">
-        <input class="input" id="caseDeductC" type="number" inputmode="decimal" placeholder="划扣③" value="${d.c||0}" style="flex:1;">
+      <div class="field-label">划扣状态</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <div class="chip ${d.a?'active':''}" data-deduct="a" onclick="App._toggleDeductFlag(this)">划扣①</div>
+        <div class="chip ${d.b?'active':''}" data-deduct="b" onclick="App._toggleDeductFlag(this)">划扣②</div>
+        <div class="chip ${d.c?'active':''}" data-deduct="c" onclick="App._toggleDeductFlag(this)">划扣③</div>
       </div>
 
       <div class="field-label">备注（可选）</div>
@@ -1941,9 +1853,9 @@ const App = {
       const project = document.getElementById('caseProject').value.trim();
       const caseRecorded = document.querySelector('[data-caserecorded].active')?.dataset.caserecorded === '1';
       const consentForm = document.querySelector('[data-consentform].active')?.dataset.consentform === '1';
-      const a = parseFloat(document.getElementById('caseDeductA').value) || 0;
-      const b = parseFloat(document.getElementById('caseDeductB').value) || 0;
-      const cc = parseFloat(document.getElementById('caseDeductC').value) || 0;
+      const a = document.querySelector('[data-deduct="a"]')?.classList.contains('active') || false;
+      const b = document.querySelector('[data-deduct="b"]')?.classList.contains('active') || false;
+      const cc = document.querySelector('[data-deduct="c"]')?.classList.contains('active') || false;
       const note = document.getElementById('caseNote').value.trim();
 
       if (isEdit) {
@@ -1969,6 +1881,10 @@ const App = {
       this.renderLifeContent();
       this.toast(isEdit ? '✅ 案例已更新' : '✅ 案例已添加');
     });
+  },
+
+  _toggleDeductFlag(el) {
+    el.classList.toggle('active');
   },
 
   _toggleCaseFlag(el, group) {
@@ -2020,26 +1936,6 @@ const App = {
         <div style="display:flex; gap:12px; justify-content:center; margin-top:16px; position:relative; z-index:1;">
           <button class="btn btn-ghost" onclick="App.addWater(-1);return false;" style="pointer-events:auto;">- 1</button>
           <button class="btn btn-primary" onclick="App.addWater(1);return false;" style="pointer-events:auto;">+ 1 杯</button>
-        </div>
-      </div>
-
-      <!-- 步数 -->
-      <div class="card" style="text-align:center;">
-        <div class="card-title"><span class="card-icon">👣</span>步数</div>
-        <div class="ring-progress">
-          <svg width="120" height="120">
-            <circle class="ring-bg" cx="60" cy="60" r="50"></circle>
-            <circle class="ring-fg" cx="60" cy="60" r="50"
-              stroke-dasharray="${2*Math.PI*50}"
-              stroke-dashoffset="${2*Math.PI*50*(1 - Math.min(h.steps/h.stepsGoal,1))}"></circle>
-          </svg>
-          <div class="ring-text">
-            <div class="ring-value">${h.steps}</div>
-            <div class="ring-label">/ ${h.stepsGoal} 步</div>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; justify-content:center; margin-top:16px; flex-wrap:wrap;">
-          ${[500,1000,2000,5000].map(n => `<button class="chip" onclick="App.addSteps(${n});return false;" style="pointer-events:auto;">+${n}</button>`).join('')}
         </div>
       </div>
 
@@ -2123,7 +2019,7 @@ const App = {
     this.navigate('health');
   },
 
-   _renderFitnessSummary() {
+  _renderFitnessSummary() {
     const f = this.fitnessLog; const today = this._dateToISO(new Date());
     const tm = (f.meals||[]).filter(m => m.date === today);
     const tc = tm.reduce((s,m) => s+(m.calories||0), 0);
@@ -2131,10 +2027,10 @@ const App = {
     const lw = ws[0]; const pw = ws[1];
     const wc = lw && pw ? (lw.value - pw.value).toFixed(1) : null;
     let h = '<div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:8px;">';
-    if (lw) { const cs = wc ? (parseFloat(wc)>0 ? '↑'+Math.abs(wc) : '↓'+Math.abs(wc)) : ''; const cc = wc ? (parseFloat(wc)>0 ? 'var(--danger)' : 'var(--success)') : 'var(--text-light)'; h += '<div onclick="App.showFitnessDetail(\'weight\')" style="cursor:pointer;"><div style="font-size:20px;font-weight:700;color:var(--primary-dark);">'+lw.value+'</div><div style="font-size:10px;color:var(--text-light);">体重kg</div>'+(cs?'<div style="font-size:11px;color:'+cc+';font-weight:600;">'+cs+'kg</div>':'')+'</div>'; } else { h += '<div onclick="App.showFitnessDetail(\'weight\')" style="cursor:pointer;"><div style="font-size:20px;font-weight:700;color:var(--text-muted);">--</div><div style="font-size:10px;color:var(--text-light);">体重kg</div></div>'; }
-    h += '<div onclick="App.showFitnessDetail(\'meal\')" style="cursor:pointer;"><div style="font-size:20px;font-weight:700;color:var(--secondary-dark);">'+tc+'</div><div style="font-size:10px;color:var(--text-light);">今日卡路里</div></div><div onclick="App.showFitnessDetail(\'all\')" style="cursor:pointer;"><div style="font-size:20px;font-weight:700;color:var(--warning);">'+tm.length+'</div><div style="font-size:10px;color:var(--text-light);">今日记录</div></div></div>';
+    if (lw) { const cs = wc ? (parseFloat(wc)>0 ? '↑'+Math.abs(wc) : '↓'+Math.abs(wc)) : ''; const cc = wc ? (parseFloat(wc)>0 ? 'var(--danger)' : 'var(--success)') : 'var(--text-light)'; h += '<div><div style="font-size:20px;font-weight:700;color:var(--primary-dark);">'+lw.value+'</div><div style="font-size:10px;color:var(--text-light);">体重kg</div>'+(cs?'<div style="font-size:11px;color:'+cc+';font-weight:600;">'+cs+'kg</div>':'')+'</div>'; } else { h += '<div><div style="font-size:20px;font-weight:700;color:var(--text-muted);">--</div><div style="font-size:10px;color:var(--text-light);">体重kg</div></div>'; }
+    h += '<div><div style="font-size:20px;font-weight:700;color:var(--secondary-dark);">'+tc+'</div><div style="font-size:10px;color:var(--text-light);">今日卡路里</div></div><div><div style="font-size:20px;font-weight:700;color:var(--warning);">'+tm.length+'</div><div style="font-size:10px;color:var(--text-light);">今日记录</div></div></div>';
     const lm = (f.measurements||[]).sort((a,b) => b.date.localeCompare(a.date))[0];
-    if (lm) h += '<div onclick="App.showFitnessDetail(\'measurement\')" style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px;cursor:pointer;">📐 腰围 '+(lm.waist||'-')+'cm · '+lm.date+'</div>';
+    if (lm) h += '<div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px;">📐 腰围 '+(lm.waist||'-')+'cm · '+lm.date+'</div>';
     return h;
   },
   showFitnessModal(type) {
@@ -2153,67 +2049,22 @@ const App = {
       this.showModal(titles.sleepLog, '<div class="field-label">日期</div><input class="input" id="fitDate" type="date" value="'+ds+'"><div class="field-label">入睡时间</div><input class="input" id="fitSleepTime" type="time" value="23:00"><div class="field-label">起床时间</div><input class="input" id="fitWakeTime" type="time" value="07:00"><div class="field-label">睡眠质量</div><div style="display:flex;gap:8px;flex-wrap:wrap;">'+['😴 很差','😪 一般','😊 良好','😄 很好'].map((q,i)=>'<div class="chip" data-quality="'+(i+1)+'" onclick="document.querySelectorAll(\'[data-quality]\').forEach(e=>e.classList.remove(\'active\'));this.classList.add(\'active\');">'+q+'</div>').join('')+'</div><div class="field-label">备注</div><input class="input" id="fitSleepNote" placeholder="做梦多">', () => { const d=document.getElementById('fitDate').value;const st=document.getElementById('fitSleepTime').value;const wt=document.getElementById('fitWakeTime').value;const qe=document.querySelector('[data-quality].active');const q=qe?parseInt(qe.dataset.quality):3;const n=document.getElementById('fitSleepNote').value.trim();const[sh,sm]=st.split(':').map(Number);const[wh,wm]=wt.split(':').map(Number);let h=(wh*60+wm-sh*60-sm)/60;if(h<0)h+=24;this.fitnessLog.sleepLog=(this.fitnessLog.sleepLog||[]).filter(s=>s.date!==d);this.fitnessLog.sleepLog.push({date:d,sleepTime:st,wakeTime:wt,hours:Math.round(h*10)/10,quality:q,note:n,ts:Date.now()});this.saveFitnessLog();this.navigate('health');this.toast('✅ 已记录'); });
     }
   },
-  
-  showFitnessDetail(filterType) {
+  showFitnessDetail() {
     const f = this.fitnessLog; const today = this._dateToISO(new Date()); const wa = new Date(); wa.setDate(wa.getDate()-7);
-    let ws = (f.weights||[]).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
-    let ms = (f.measurements||[]).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
-    let wm = (f.meals||[]).filter(m => m.date >= this._dateToISO(wa) && m.date <= today).sort((a,b)=>b.date.localeCompare(a.date));
-    let wsl = (f.sleepLog||[]).filter(s => s.date >= this._dateToISO(wa) && s.date <= today).sort((a,b)=>b.date.localeCompare(a.date));
-    if (filterType && filterType !== 'all') {
-      if (filterType === 'weight') { ms = []; wm = []; wsl = []; }
-      else if (filterType === 'measurement') { ws = []; wm = []; wsl = []; }
-      else if (filterType === 'meal') { ws = []; ms = []; wsl = []; }
-      else if (filterType === 'sleepLog') { ws = []; ms = []; wm = []; }
-    }
+    const ws = (f.weights||[]).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+    const ms = (f.measurements||[]).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+    const wm = (f.meals||[]).filter(m => m.date >= this._dateToISO(wa) && m.date <= today).sort((a,b)=>b.date.localeCompare(a.date));
+    const wsl = (f.sleepLog||[]).filter(s => s.date >= this._dateToISO(wa) && s.date <= today).sort((a,b)=>b.date.localeCompare(a.date));
     let h = '';
-    if (ws.length>0) { h += '<div class="field-label">⚖️ 体重记录（点击详情）</div><div class="card" style="padding:8px 12px;">'+ws.map(w=>'<div onclick="App.showFitnessItemDetail(\'weight\','+JSON.stringify(w).replace(/"/g,'&quot;')+')" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;"><span style="color:var(--text-light);">'+w.date+'</span><span style="font-weight:700;">'+w.value+'kg'+(w.bodyFat?' · 体脂'+w.bodyFat+'%':'')+'</span></div>').join('')+'</div>'; }
-    if (ms.length>0) { h += '<div class="field-label">📐 围度记录（点击详情）</div><div class="card" style="padding:8px 12px;">'+ms.map(m=>'<div onclick="App.showFitnessItemDetail(\'measurement\','+JSON.stringify(m).replace(/"/g,'&quot;')+')" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;"><span style="color:var(--text-light);">'+m.date+'</span><span>胸'+(m.chest||'-')+' 腰'+(m.waist||'-')+' 臀'+(m.hip||'-')+'</span></div>').join('')+'</div>'; }
-    if (wm.length>0) { h += '<div class="field-label">🍽️ 本周饮食（点击详情）</div><div class="card" style="padding:8px 12px;">';const mn={breakfast:'🌅早',lunch:'☀️午',dinner:'🌙晚',snack:'🍪加'};h+=wm.map(m=>'<div onclick="App.showFitnessItemDetail(\'meal\','+JSON.stringify(m).replace(/"/g,'&quot;')+')" style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;"><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">'+m.date+' '+(mn[m.type]||'')+'</span><span style="font-weight:600;">'+(m.calories||'?')+'kcal</span></div><div style="margin-top:2px;">'+m.food+'</div></div>').join('');h+='</div>'; }
-    if (wsl.length>0) { h += '<div class="field-label">😴 本周作息（点击详情）</div><div class="card" style="padding:8px 12px;">';const qn=['😴','😪','😊','😄'];h+=wsl.map(s=>'<div onclick="App.showFitnessItemDetail(\'sleepLog\','+JSON.stringify(s).replace(/"/g,'&quot;')+')" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;"><span style="color:var(--text-light);">'+s.date+'</span><span>'+s.sleepTime+'-'+s.wakeTime+' ('+s.hours+'h) '+qn[s.quality-1]+'</span></div>').join('');h+='</div>'; }
+    if (ws.length>0) { h += '<div class="field-label">⚖️ 体重记录</div><div class="card" style="padding:8px 12px;">'+ws.map(w=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-light);">'+w.date+'</span><span style="font-weight:700;">'+w.value+'kg'+(w.bodyFat?' · 体脂'+w.bodyFat+'%':'')+'</span></div>').join('')+'</div>'; }
+    if (ms.length>0) { h += '<div class="field-label">📐 围度记录</div><div class="card" style="padding:8px 12px;">'+ms.map(m=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-light);">'+m.date+'</span><span>胸'+(m.chest||'-')+' 腰'+(m.waist||'-')+' 臀'+(m.hip||'-')+'</span></div>').join('')+'</div>'; }
+    if (wm.length>0) { h += '<div class="field-label">🍽️ 本周饮食</div><div class="card" style="padding:8px 12px;">';const mn={breakfast:'🌅早',lunch:'☀️午',dinner:'🌙晚',snack:'🍪加'};h+=wm.map(m=>'<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-light);">'+m.date+' '+(mn[m.type]||'')+'</span><span style="font-weight:600;">'+(m.calories||'?')+'kcal</span></div><div style="margin-top:2px;">'+m.food+'</div></div>').join('');h+='</div>'; }
+    if (wsl.length>0) { h += '<div class="field-label">😴 本周作息</div><div class="card" style="padding:8px 12px;">';const qn=['😴','😪','😊','😄'];h+=wsl.map(s=>'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-light);">'+s.date+'</span><span>'+s.sleepTime+'-'+s.wakeTime+' ('+s.hours+'h) '+qn[s.quality-1]+'</span></div>').join('');h+='</div>'; }
     if (h==='') h = '<div style="text-align:center;padding:20px;color:var(--text-light);">暂无记录</div>';
     this.showModal('📊 减脂详细记录', h, null);
     setTimeout(() => { const c=document.getElementById('modalConfirm');const cl=document.getElementById('modalCancel');if(c)c.style.display='none';if(cl){cl.textContent='关闭';cl.style.flex='1';} }, 50);
   },
-    
-  showFitnessItemDetail(type, item) {
-    let html = '<div style="line-height:1.8;">';
-    html += '<div style="font-weight:700;font-size:16px;margin-bottom:12px;">📋 记录详情</div>';
-    html += '<div style="background:var(--primary-light);border-radius:12px;padding:12px;margin-bottom:12px;">';
-    html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">日期</div>';
-    html += '<div style="font-weight:600;font-size:15px;margin-bottom:10px;">'+item.date+'</div>';
-    if (type === 'weight') {
-      html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">体重</div>';
-      html += '<div style="font-weight:600;font-size:18px;color:var(--primary-dark);margin-bottom:10px;">'+item.value+' kg</div>';
-      if (item.bodyFat) { html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">体脂率</div><div style="font-weight:600;margin-bottom:10px;">'+item.bodyFat+'%</div>'; }
-    } else if (type === 'measurement') {
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">胸围</div><div style="font-weight:700;font-size:16px;">'+(item.chest||'-')+'</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">腰围</div><div style="font-weight:700;font-size:16px;">'+(item.waist||'-')+'</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">臀围</div><div style="font-weight:700;font-size:16px;">'+(item.hip||'-')+'</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">大腿围</div><div style="font-weight:700;font-size:16px;">'+(item.thigh||'-')+'</div></div>';
-      html += '</div>';
-    } else if (type === 'meal') {
-      const mn={breakfast:'🌅 早餐',lunch:'☀️ 午餐',dinner:'🌙 晚餐',snack:'🍪 加餐'};
-      html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">餐次</div>';
-      html += '<div style="font-weight:600;margin-bottom:10px;">'+(mn[item.type]||item.type)+'</div>';
-      html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">食物</div>';
-      html += '<div style="font-weight:600;margin-bottom:10px;">'+item.food+'</div>';
-      if (item.calories) { html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">热量</div><div style="font-weight:600;color:var(--secondary-dark);margin-bottom:10px;">'+item.calories+' kcal</div>'; }
-    } else if (type === 'sleepLog') {
-      const qn=['很差','一般','良好','很好'];
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">入睡</div><div style="font-weight:700;font-size:16px;">'+item.sleepTime+'</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">起床</div><div style="font-weight:700;font-size:16px;">'+item.wakeTime+'</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">时长</div><div style="font-weight:700;font-size:16px;color:var(--primary-dark);">'+item.hours+'h</div></div>';
-      html += '<div style="background:white;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--text-light);">质量</div><div style="font-weight:700;font-size:16px;">'+qn[item.quality-1]+'</div></div>';
-      html += '</div>';
-    }
-    if (item.note) { html += '<div style="font-size:13px;color:var(--text-light);margin-bottom:4px;">备注</div><div style="background:white;border-radius:8px;padding:10px;font-size:13px;">'+this._escapeHtml(item.note)+'</div>'; }
-    html += '</div></div>';
-    this.showModal('📋 记录详情', html, null);
-    setTimeout(() => { const c=document.getElementById('modalConfirm');if(c)c.style.display='none';const cl=document.getElementById('modalCancel');if(cl){cl.textContent='关闭';cl.style.flex='1';} }, 50);
-  },
+
   // ============================================
   // 设置页 — 个人资料/主题/模块管理
   // ============================================
@@ -2356,8 +2207,8 @@ const App = {
             <div class="stat-label">日记篇</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">${this.expenses.length}</div>
-            <div class="stat-label">记账笔</div>
+            <div class="stat-value">${this.notes.length}</div>
+            <div class="stat-label">笔记数</div>
           </div>
           <div class="stat-card">
             <div class="stat-value">${Object.keys(this.attendance.records || {}).length}</div>
@@ -2613,8 +2464,6 @@ const App = {
       customModuleData: this.customModuleData,
       attendance: this.attendance,
       dailyCases: this.dailyCases,
-      fitnessLog: this.fitnessLog,
-      readings: this.readings,
       exportDate: new Date().toISOString()
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2649,7 +2498,7 @@ const App = {
           'expenses', 'notes', 'health', 'customModuleData',
           'dailyPlans', 'weeklyReports', 'aiRules', 'reminders',
           'readings', 'fitnessLog', 'dermaKnowledge', 'dermaSearchHistory',
-          'attendance', 'dailyCases'
+          'attendance', 'dailyCases', 'dermaPostopCare', 'dermaContraindications'
         ];
         keys.forEach(key => {
           if (data[key] !== undefined) {
@@ -2685,10 +2534,34 @@ const App = {
     let contentHtml = '';
     if (sub === 'search') {
       // 疾病索引 + 搜索
-      const filtered = activeCat === '全部' ? DERMA_INDEX : DERMA_INDEX.filter(d => d.cat === activeCat);
+      const filteredIndex = activeCat === '全部' 
+        ? DERMA_INDEX.filter(d => d.cn !== '术后护理指南') 
+        : DERMA_INDEX.filter(d => d.cat === activeCat && d.cn !== '术后护理指南');
       const historyHtml = (this.dermaSearchHistory || []).length > 0
         ? `<div class="section-title">🕐 最近搜索</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${this.dermaSearchHistory.slice(-8).reverse().map(h => `<span class="chip" style="font-size:12px;" onclick="App._searchDermaByName('${h}')">${h}</span>`).join('')}</div>`
         : '';
+      
+      const specialCardsHtml = `
+        <div class="card" style="cursor:pointer; padding:14px; margin-bottom:10px; background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border: 1px solid #A5D6A7;" onclick="App.showPostopCareModal()">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:15px; color:#2E7D32;">🩹 术后护理指南</div>
+              <div style="font-size:12px; color:#388E3C; margin-top:3px;">${(this.dermaPostopCare || []).length} 条护理方案 · 点击编辑管理</div>
+            </div>
+            <span style="font-size:20px;">✏️</span>
+          </div>
+        </div>
+        <div class="card" style="cursor:pointer; padding:14px; margin-bottom:10px; background: linear-gradient(135deg, #FFEBEE, #FFCDD2); border: 1px solid #EF9A9A;" onclick="App.showContraindicationsModal()">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:15px; color:#C62828;">⚠️ 禁忌症</div>
+              <div style="font-size:12px; color:#D32F2F; margin-top:3px;">${(this.dermaContraindications || []).length} 条禁忌 · 点击编辑管理</div>
+            </div>
+            <span style="font-size:20px;">✏️</span>
+          </div>
+        </div>
+      `;
+      
       contentHtml = `
         <div class="card" style="margin-bottom:12px;">
           <div style="display:flex;gap:8px;">
@@ -2701,9 +2574,10 @@ const App = {
           ${cats.map(c => `<span class="chip ${c===activeCat?'active':''}" style="font-size:12px;white-space:nowrap;" onclick="App._filterDermaCat('${c}')">${c}</span>`).join('')}
         </div>
         ${historyHtml}
-        <div class="section-title">📋 ${activeCat==='全部'?'疾病索引':activeCat}（${filtered.length}种）</div>
+        ${specialCardsHtml}
+        <div class="section-title">📋 ${activeCat==='全部'?'疾病索引':activeCat}（${filteredIndex.length}种）</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          ${filtered.map(d => `
+          ${filteredIndex.map(d => `
             <div class="card" style="cursor:pointer;padding:14px;" onclick="App._searchDermaByName('${d.cn}')">
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <div style="flex:1;">
@@ -2793,6 +2667,150 @@ const App = {
   _goDermaSub(sub) { this.dermaSub = sub; this.navigate('dermatology'); },
   _dermaCat: '全部',
   _filterDermaCat(cat) { this._dermaCat = cat; this.navigate('dermatology'); },
+
+  // 术后护理指南 — 可编辑
+  showPostopCareModal() {
+    let html = '<div style="font-size:13px; color:var(--text-light); margin-bottom:12px;">点击条目可编辑，底部可添加新条目</div>';
+    html += (this.dermaPostopCare || []).map((item, idx) => `
+      <div class="card" style="margin-bottom:8px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-weight:600; font-size:14px;">${this._escapeHtml(item.name)}</span>
+          <div style="display:flex; gap:6px;">
+            <button class="chip" style="font-size:11px; padding:4px 8px;" onclick="event.stopPropagation();App.editPostopCareItem(${idx})">✏️</button>
+            <button class="chip" style="font-size:11px; padding:4px 8px; color:var(--danger);" onclick="event.stopPropagation();App.deletePostopCareItem(${idx})">🗑️</button>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-light); line-height:1.6; white-space:pre-wrap;">${this._escapeHtml(item.detail)}</div>
+      </div>
+    `).join('');
+    html += '<button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="App.addPostopCareItem()">➕ 添加新条目</button>';
+    
+    this.showModal('🩹 术后护理指南（可编辑）', html, null);
+    setTimeout(() => {
+      const confirmBtn = document.getElementById('modalConfirm');
+      const cancelBtn = document.getElementById('modalCancel');
+      if (confirmBtn) confirmBtn.style.display = 'none';
+      if (cancelBtn) { cancelBtn.textContent = '关闭'; cancelBtn.style.flex = '1'; }
+    }, 50);
+  },
+
+  editPostopCareItem(idx) {
+    const item = this.dermaPostopCare[idx];
+    this.showModal('编辑术后护理条目', `
+      <div class="field-label">标题</div>
+      <input class="input" id="poName" value="${this._escapeHtml(item.name)}" maxlength="60">
+      <div class="field-label">内容</div>
+      <textarea class="input" id="poDetail" rows="8">${this._escapeHtml(item.detail)}</textarea>
+    `, () => {
+      const name = document.getElementById('poName').value.trim();
+      const detail = document.getElementById('poDetail').value.trim();
+      if (!name) { this.toast('请输入标题'); return; }
+      this.dermaPostopCare[idx] = { ...item, name, detail };
+      this.saveDermaPostopCare();
+      document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+      setTimeout(() => this.showPostopCareModal(), 100);
+      this.toast('✅ 已更新');
+    });
+  },
+
+  addPostopCareItem() {
+    this.showModal('添加术后护理条目', `
+      <div class="field-label">标题</div>
+      <input class="input" id="poName" placeholder="如：激光术后护理..." maxlength="60">
+      <div class="field-label">内容</div>
+      <textarea class="input" id="poDetail" rows="8" placeholder="详细护理步骤..."></textarea>
+    `, () => {
+      const name = document.getElementById('poName').value.trim();
+      const detail = document.getElementById('poDetail').value.trim();
+      if (!name) return;
+      this.dermaPostopCare.push({ name, type: '术后护理', detail });
+      this.saveDermaPostopCare();
+      document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+      setTimeout(() => this.showPostopCareModal(), 100);
+      this.toast('✅ 已添加');
+    });
+  },
+
+  deletePostopCareItem(idx) {
+    if (!confirm('确定删除这条护理条目？')) return;
+    this.dermaPostopCare.splice(idx, 1);
+    this.saveDermaPostopCare();
+    document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+    setTimeout(() => this.showPostopCareModal(), 100);
+    this.toast('🗑️ 已删除');
+  },
+
+  // 禁忌症 — 可编辑
+  showContraindicationsModal() {
+    let html = '<div style="font-size:13px; color:var(--text-light); margin-bottom:12px;">点击条目可编辑，底部可添加新条目</div>';
+    html += (this.dermaContraindications || []).map((item, idx) => `
+      <div class="card" style="margin-bottom:8px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-weight:600; font-size:14px;">${this._escapeHtml(item.name)}</span>
+          <div style="display:flex; gap:6px;">
+            <button class="chip" style="font-size:11px; padding:4px 8px;" onclick="event.stopPropagation();App.editContraindicationItem(${idx})">✏️</button>
+            <button class="chip" style="font-size:11px; padding:4px 8px; color:var(--danger);" onclick="event.stopPropagation();App.deleteContraindicationItem(${idx})">🗑️</button>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-light); line-height:1.6; white-space:pre-wrap;">${this._escapeHtml(item.detail)}</div>
+      </div>
+    `).join('');
+    html += '<button class="btn btn-primary" style="width:100%; margin-top:8px;" onclick="App.addContraindicationItem()">➕ 添加新条目</button>';
+    
+    this.showModal('⚠️ 禁忌症（可编辑）', html, null);
+    setTimeout(() => {
+      const confirmBtn = document.getElementById('modalConfirm');
+      const cancelBtn = document.getElementById('modalCancel');
+      if (confirmBtn) confirmBtn.style.display = 'none';
+      if (cancelBtn) { cancelBtn.textContent = '关闭'; cancelBtn.style.flex = '1'; }
+    }, 50);
+  },
+
+  editContraindicationItem(idx) {
+    const item = this.dermaContraindications[idx];
+    this.showModal('编辑禁忌症条目', `
+      <div class="field-label">标题</div>
+      <input class="input" id="ctName" value="${this._escapeHtml(item.name)}" maxlength="60">
+      <div class="field-label">内容</div>
+      <textarea class="input" id="ctDetail" rows="8">${this._escapeHtml(item.detail)}</textarea>
+    `, () => {
+      const name = document.getElementById('ctName').value.trim();
+      const detail = document.getElementById('ctDetail').value.trim();
+      if (!name) { this.toast('请输入标题'); return; }
+      this.dermaContraindications[idx] = { ...item, name, detail };
+      this.saveDermaContraindications();
+      document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+      setTimeout(() => this.showContraindicationsModal(), 100);
+      this.toast('✅ 已更新');
+    });
+  },
+
+  addContraindicationItem() {
+    this.showModal('添加禁忌症条目', `
+      <div class="field-label">标题</div>
+      <input class="input" id="ctName" placeholder="如：射频类禁忌症..." maxlength="60">
+      <div class="field-label">内容</div>
+      <textarea class="input" id="ctDetail" rows="8" placeholder="详细禁忌内容..."></textarea>
+    `, () => {
+      const name = document.getElementById('ctName').value.trim();
+      const detail = document.getElementById('ctDetail').value.trim();
+      if (!name) return;
+      this.dermaContraindications.push({ name, type: '禁忌症', detail });
+      this.saveDermaContraindications();
+      document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+      setTimeout(() => this.showContraindicationsModal(), 100);
+      this.toast('✅ 已添加');
+    });
+  },
+
+  deleteContraindicationItem(idx) {
+    if (!confirm('确定删除这条禁忌症条目？')) return;
+    this.dermaContraindications.splice(idx, 1);
+    this.saveDermaContraindications();
+    document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+    setTimeout(() => this.showContraindicationsModal(), 100);
+    this.toast('🗑️ 已删除');
+  },
 
   // 搜索疾病
   _searchDerma() {
@@ -3125,7 +3143,7 @@ ${combined}
 
   clearData() {
     if (confirm('确定要清空所有数据吗？此操作不可恢复。')) {
-      ['profile','todos','habits','schedules','diaries','expenses','notes','health','customModuleData','dailyPlans','weeklyReports','aiRules','focusGuided','reminders','readings','fitnessLog','dermaKnowledge','dermaSearchHistory','pwaDataChecked','attendance','dailyCases'].forEach(k => Store.remove(k));
+      ['profile','todos','habits','schedules','diaries','expenses','notes','health','customModuleData','dailyPlans','weeklyReports','aiRules','focusGuided','reminders','readings','fitnessLog','dermaKnowledge','dermaSearchHistory','pwaDataChecked','attendance','dailyCases','dermaPostopCare','dermaContraindications'].forEach(k => Store.remove(k));
       this.loadProfile();
       this.loadAllData();
       this.renderTabbar();
@@ -3664,8 +3682,8 @@ ${combined}
       html += '<div class="field-label">📋 每日案例</div>';
       dayCases.forEach(c => {
         const d = c.deductions || {};
-        const total = (parseFloat(d.a)||0)+(parseFloat(d.b)||0)+(parseFloat(d.c)||0);
-        html += '<div class="day-detail-item"><span>📋</span><span style="flex:1">' + this._escapeHtml(c.caseName) + (c.project ? ' · ' + this._escapeHtml(c.project) : '') + '</span><span style="font-weight:600;color:var(--primary-dark);">¥' + total.toFixed(0) + '</span></div>';
+        const total = (d.a?1:0)+(d.b?1:0)+(d.c?1:0);
+        html += '<div class="day-detail-item"><span>📋</span><span style="flex:1">' + this._escapeHtml(c.caseName) + (c.project ? ' · ' + this._escapeHtml(c.project) : '') + '</span><span style="font-weight:600;color:var(--primary-dark);">' + total + '项划扣</span></div>';
       });
     }
     if (!schedules.length && !todos.length && !this.habits.length && !diaries.length && !attRecord && !dayCases.length) {
@@ -4721,7 +4739,9 @@ END:VCALENDAR`;
       dermaKnowledge: this.dermaKnowledge,
       dermaSearchHistory: this.dermaSearchHistory,
       attendance: this.attendance,
-      dailyCases: this.dailyCases
+      dailyCases: this.dailyCases,
+      dermaPostopCare: this.dermaPostopCare,
+      dermaContraindications: this.dermaContraindications
     };
   },
 
@@ -4767,6 +4787,8 @@ END:VCALENDAR`;
       if (cloudData.dermaSearchHistory) this.dermaSearchHistory = cloudData.dermaSearchHistory;
       if (cloudData.attendance) this.attendance = cloudData.attendance;
       if (cloudData.dailyCases) this.dailyCases = cloudData.dailyCases;
+      if (cloudData.dermaPostopCare) this.dermaPostopCare = cloudData.dermaPostopCare;
+      if (cloudData.dermaContraindications) this.dermaContraindications = cloudData.dermaContraindications;
       // 恢复 DeepSeek API Key
       if (result.deepseek_key) Store.set('deepseekKey', result.deepseek_key);
       // 保存到本地
@@ -4833,6 +4855,8 @@ END:VCALENDAR`;
     if (this.dermaSearchHistory) Store.set('dermaSearchHistory', this.dermaSearchHistory);
     Store.set('attendance', this.attendance);
     Store.set('dailyCases', this.dailyCases);
+    Store.set('dermaPostopCare', this.dermaPostopCare);
+    Store.set('dermaContraindications', this.dermaContraindications);
     Store.set('_lastLocalSave', Date.now());
   },
 
